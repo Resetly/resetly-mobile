@@ -96,7 +96,17 @@ type IBadgeIconProps = React.ComponentPropsWithoutRef<typeof PrimitiveIcon> &
     size?: number;
 };
   
-const StyledUIIcon = styled(UIIcon as any, {
+type StyledIconFn = (
+  component: typeof UIIcon,
+  config: Record<string, unknown>,
+) => React.ForwardRefExoticComponent<
+  React.ComponentPropsWithoutRef<typeof UIIcon> & {
+    className?: string;
+    size?: number;
+  } & React.RefAttributes<React.ComponentRef<typeof Svg>>
+>;
+
+const StyledUIIcon = (styled as unknown as StyledIconFn)(UIIcon, {
   className: {
     target: 'style',
     nativeStyleToProp: {
@@ -107,7 +117,7 @@ const StyledUIIcon = styled(UIIcon as any, {
       stroke: true,
     },
   },
-} as any);
+});
 
 
 const BadgeIcon = React.forwardRef<
