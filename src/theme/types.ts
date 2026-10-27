@@ -1,6 +1,6 @@
 /**
- * Theme pack contract. Every pack (default, or your own) implements this shape,
- * so swapping the app's look is a one-line change in `src/theme/index.ts`.
+ * Theme pack contract. Every pack implements this shape.
+ * Swapping the app's look is a one-line change in `src/theme/index.ts`.
  */
 
 export interface ThemeColors {
@@ -11,9 +11,16 @@ export interface ThemeColors {
   backgroundSelected: string;
   primary: string;
   onPrimary: string;
+  /** Accent color for progress indicators and positive actions. */
+  accent: string;
+  onAccent: string;
   danger: string;
+  warning: string;
   success: string;
   border: string;
+  /** Card surface color (may differ from backgroundElement). */
+  card: string;
+  onCard: string;
 }
 
 export interface ThemePack {

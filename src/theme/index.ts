@@ -7,10 +7,10 @@
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import { defaultPack } from './packs/default';
+import { resetlyPack } from './packs/resetly';
 import type { ThemeColors, ThemePack } from './types';
 
-export const activePack: ThemePack = defaultPack;
+export const activePack: ThemePack = resetlyPack;
 
 export function useTheme(): ThemeColors {
   const scheme = useColorScheme();
@@ -20,9 +20,11 @@ export function useTheme(): ThemeColors {
 export { Fonts, Spacing, BottomTabInset, MaxContentWidth } from '@/constants/theme';
 
 export const Radius = {
-  sm: 6,
-  md: 10,
-  lg: 16,
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 20,
+  xl: 28,
   full: 9999,
 } as const;
 

@@ -1,23 +1,43 @@
 {
   "common": {
-    "appName": "React Native Expo Boilerplate",
+    "appName": "Resetly",
     "loading": "Loading…",
-    "retry": "Retry",
-    "error": "Something went wrong"
+    "retry": "Try Again",
+    "error": "Something went wrong",
+    "mockDataNotice": "[Demo data — not synced with any account]"
   },
   "home": {
-    "title": "Home",
-    "welcome": "Welcome to your new app"
+    "greeting": "Good day",
+    "headline": "Your reset starts here.",
+    "subheadline": "Small, consistent steps build the life you want.",
+    "ctaBegin": "Begin Your Journey",
+    "ctaContinue": "Log Today's Habits",
+    "todaySection": "Today",
+    "habitsSection": "Your Habits",
+    "reflectionSection": "Daily Reflection",
+    "reflectionPrompt": "What's one thing you can do today to move closer to the person you want to become?",
+    "streakLabel": "Day streak",
+    "weeklyLabel": "This week"
   },
-  "explore": {
-    "title": "Explore"
+  "progress": {
+    "title": "Progress",
+    "subtitle": "Your journey so far",
+    "weeklyCompletion": "Weekly Completion",
+    "historySectionTitle": "Recent Weeks",
+    "streakSectionTitle": "Longest Streak",
+    "habitCount": "Habits Tracked"
   },
-  "chat": {
-    "title": "AI Chat",
-    "empty": "Ask anything to get started",
-    "placeholder": "Message…",
-    "send": "Send",
-    "thinking": "Thinking…",
-    "systemPrompt": "You are a helpful assistant inside a mobile app. Keep responses concise."
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Preferences & account",
+    "appearance": "Appearance",
+    "themeSystem": "Follow system",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "haptics": "Haptic feedback",
+    "version": "Version",
+    "backendSection": "Backend",
+    "backendUrl": "API URL",
+    "backendNotConnected": "Not connected — configure EXPO_PUBLIC_API_URL"
   }
 }

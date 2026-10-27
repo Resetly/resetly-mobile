@@ -1,98 +1,157 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
+import { StyleSheet, View } from 'react-native';
 
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
+import { ScreenContainer } from '@/components/ui/ScreenContainer';
+import { SectionHeader } from '@/components/ui/SectionHeader';
+import { AppButton } from '@/components/ui/AppButton';
+import { Card } from '@/components/ui/Card';
+import { ProgressBar } from '@/components/ui/ProgressBar';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
+import { HabitCard } from '@/features/habits/HabitCard';
+import { MOCK_HABITS, MOCK_WEEKLY_STATS } from '@/features/habits/mock-data';
+import { Spacing } from '@/constants/theme';
+import { Radius } from '@/theme';
+import { useTheme } from '@/hooks/use-theme';
 
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
-}
+/** [MOCK] Weekly completion rate computed from MOCK_WEEKLY_STATS. */
+const WEEKLY_RATE = MOCK_WEEKLY_STATS.completedThisWeek / MOCK_WEEKLY_STATS.totalThisWeek;
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
+  const theme = useTheme();
+
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp;Expo
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
+    <ScreenContainer>
+      {/* Greeting */}
+      <View style={styles.greeting}>
+        <ThemedText type="small" themeColor="textSecondary">
+          {t('home.greeting')} 👋
         </ThemedText>
+        <ThemedText type="title" style={styles.headline}>
+          {t('home.headline')}
+        </ThemedText>
+        <ThemedText type="default" themeColor="textSecondary">
+          {t('home.subheadline')}
+        </ThemedText>
+      </View>
 
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
+      {/* Primary CTA */}
+      <AppButton
+        label={t('home.ctaContinue')}
+        onPress={() => {/* navigate to habit logging */}}
+        variant="primary"
+        size="lg"
+      />
 
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+      {/* Weekly Progress Card */}
+      <Card>
+        <View style={styles.progressCardInner}>
+          <View style={styles.progressCardHeader}>
+            <ThemedText type="smallBold">{t('home.weeklyLabel')}</ThemedText>
+            <ThemedText type="smallBold" style={{ color: theme.accent }}>
+              {Math.round(WEEKLY_RATE * 100)}%
+            </ThemedText>
+          </View>
+          <ProgressBar progress={WEEKLY_RATE} />
+          <View style={styles.progressStats}>
+            <View style={styles.statItem}>
+              <ThemedText type="subtitle" style={[styles.statValue, { color: theme.primary }]}>
+                {MOCK_WEEKLY_STATS.completedThisWeek}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                completed
+              </ThemedText>
+            </View>
+            <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
+            <View style={styles.statItem}>
+              <ThemedText type="subtitle" style={[styles.statValue, { color: theme.accent }]}>
+                {MOCK_WEEKLY_STATS.longestCurrentStreak}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                {t('home.streakLabel')}
+              </ThemedText>
+            </View>
+            <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
+            <View style={styles.statItem}>
+              <ThemedText type="subtitle" style={[styles.statValue, { color: theme.success }]}>
+                {MOCK_WEEKLY_STATS.habitsOnTrack}
+              </ThemedText>
+              <ThemedText type="small" themeColor="textSecondary">
+                on track
+              </ThemedText>
+            </View>
+          </View>
+          {/* Mock data notice */}
+          <ThemedText type="small" themeColor="textSecondary" style={styles.mockNotice}>
+            {t('common.mockDataNotice')}
+          </ThemedText>
+        </View>
+      </Card>
+
+      {/* Habit List */}
+      <SectionHeader title={t('home.habitsSection')} subtitle="Your active routines" />
+      {MOCK_HABITS.map((habit) => (
+        <HabitCard key={habit.id} habit={habit} />
+      ))}
+
+      {/* Daily Reflection */}
+      <View style={[styles.reflectionCard, { backgroundColor: theme.primary, borderRadius: Radius.lg }]}>
+        <ThemedText type="smallBold" style={{ color: theme.onPrimary, opacity: 0.7 }}>
+          {t('home.reflectionSection')}
+        </ThemedText>
+        <ThemedText type="default" style={{ color: theme.onPrimary, lineHeight: 26 }}>
+          "{t('home.reflectionPrompt')}"
+        </ThemedText>
+      </View>
+    </ScreenContainer>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
+  greeting: {
+    gap: Spacing.two,
+  },
+  headline: {
+    fontSize: 32,
+    lineHeight: 40,
+    fontWeight: '700',
+  },
+  progressCardInner: {
+    gap: Spacing.three,
+  },
+  progressCardHeader: {
     flexDirection: 'row',
-  },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
   },
-  heroSection: {
+  progressStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+    paddingTop: Spacing.two,
   },
-  title: {
+  statItem: {
+    alignItems: 'center',
+    gap: 2,
+    flex: 1,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: '700',
+    lineHeight: 34,
+  },
+  statDivider: {
+    width: 1,
+    height: 36,
+  },
+  mockNotice: {
+    fontSize: 11,
     textAlign: 'center',
+    fontStyle: 'italic',
+    opacity: 0.6,
   },
-  code: {
-    textTransform: 'uppercase',
-  },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
+  reflectionCard: {
+    padding: Spacing.four,
+    gap: Spacing.two,
   },
 });
