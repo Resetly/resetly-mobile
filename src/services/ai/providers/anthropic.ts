@@ -31,6 +31,26 @@ function normalizeStopReason(stopReason: string | null): AIResponse['stopReason'
   return 'other';
 }
 
+interface AnthropicStreamEvent {
+  type: string;
+  message?: {
+    usage?: {
+      input_tokens?: number;
+    };
+  };
+  delta?: {
+    type?: string;
+    text?: string;
+    stop_reason?: string | null;
+  };
+  usage?: {
+    output_tokens?: number;
+  };
+  error?: {
+    message?: string;
+  };
+}
+
 /**
  * Anthropic Messages API adapter (Claude). Thinking is left at the model's
  * default (adaptive on claude-opus-5). Always check stopReason === 'refusal'
@@ -76,13 +96,13 @@ export function anthropicProvider(options: AnthropicOptions): AIProvider {
       let outputTokens = 0;
 
       for await (const { data } of sseEvents(API_URL, headers, buildBody(request, options, true))) {
-        const event = JSON.parse(data) as Record<string, any>;
+        const event = JSON.parse(data) as AnthropicStreamEvent;
         switch (event.type) {
           case 'message_start':
             inputTokens = event.message?.usage?.input_tokens ?? 0;
             break;
           case 'content_block_delta':
-            if (event.delta?.type === 'text_delta') {
+            if (event.delta?.type === 'text_delta' && typeof event.delta.text === 'string') {
               text += event.delta.text;
               onDelta(event.delta.text);
             }

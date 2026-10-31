@@ -25,8 +25,23 @@ function buildBody(request: AIRequest) {
   };
 }
 
-function extractText(candidate: Record<string, any> | undefined): string {
-  const parts: { text?: string }[] = candidate?.content?.parts ?? [];
+interface GeminiPart {
+  text?: string;
+}
+
+interface GeminiCandidate {
+  content?: {
+    parts?: GeminiPart[];
+  };
+  finishReason?: string;
+}
+
+interface GeminiStreamChunk {
+  candidates?: GeminiCandidate[];
+}
+
+function extractText(candidate: GeminiCandidate | undefined): string {
+  const parts: GeminiPart[] = candidate?.content?.parts ?? [];
   return parts.map((part) => part.text ?? '').join('');
 }
 
@@ -72,7 +87,7 @@ export function geminiProvider(options: GeminiOptions): AIProvider {
 
       const url = `${BASE_URL}/${request.model ?? model()}:streamGenerateContent?alt=sse`;
       for await (const { data } of sseEvents(url, headers, buildBody(request))) {
-        const event = JSON.parse(data) as Record<string, any>;
+        const event = JSON.parse(data) as GeminiStreamChunk;
         const candidate = event.candidates?.[0];
         const delta = extractText(candidate);
         if (delta) {

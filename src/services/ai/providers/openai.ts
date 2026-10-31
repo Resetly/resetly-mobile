@@ -31,6 +31,17 @@ function buildBody(request: AIRequest, options: OpenAIOptions, stream: boolean) 
   };
 }
 
+interface OpenAIChoice {
+  delta?: {
+    content?: string;
+  };
+  finish_reason?: string;
+}
+
+interface OpenAIStreamChunk {
+  choices?: OpenAIChoice[];
+}
+
 /** OpenAI Chat Completions adapter (also fits OpenAI-compatible endpoints). */
 export function openAIProvider(options: OpenAIOptions): AIProvider {
   const url = options.baseUrl ?? API_URL;
@@ -73,7 +84,7 @@ export function openAIProvider(options: OpenAIOptions): AIProvider {
 
       for await (const { data } of sseEvents(url, headers, buildBody(request, options, true))) {
         if (data === '[DONE]') break;
-        const event = JSON.parse(data) as Record<string, any>;
+        const event = JSON.parse(data) as OpenAIStreamChunk;
         const choice = event.choices?.[0];
         const delta = choice?.delta?.content;
         if (typeof delta === 'string' && delta.length > 0) {
