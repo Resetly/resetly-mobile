@@ -1,157 +1,149 @@
-import { useTranslation } from 'react-i18next';
-import { StyleSheet, View } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { ScreenContainer } from '@/components/ui/ScreenContainer';
-import { SectionHeader } from '@/components/ui/SectionHeader';
-import { AppButton } from '@/components/ui/AppButton';
-import { Card } from '@/components/ui/Card';
-import { ProgressBar } from '@/components/ui/ProgressBar';
-import { ThemedText } from '@/components/themed-text';
-import { HabitCard } from '@/features/habits/HabitCard';
-import { MOCK_HABITS, MOCK_WEEKLY_STATS } from '@/features/habits/mock-data';
-import { Spacing } from '@/constants/theme';
-import { Radius } from '@/theme';
-import { useTheme } from '@/hooks/use-theme';
-
-/** [MOCK] Weekly completion rate computed from MOCK_WEEKLY_STATS. */
-const WEEKLY_RATE = MOCK_WEEKLY_STATS.completedThisWeek / MOCK_WEEKLY_STATS.totalThisWeek;
+import { Badge, BadgeText } from '@/components/ui/badge';
+import { Box } from '@/components/ui/box';
+import { useSettings } from '@/store/settings';
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
-  const theme = useTheme();
+  const { hapticsEnabled, setHapticsEnabled } = useSettings();
+  const apiUrl = process.env.EXPO_PUBLIC_API_URL ?? 'Not configured (check .env.local)';
 
   return (
-    <ScreenContainer>
-      {/* Greeting */}
-      <View style={styles.greeting}>
-        <ThemedText type="small" themeColor="textSecondary">
-          {t('home.greeting')} 👋
-        </ThemedText>
-        <ThemedText type="title" style={styles.headline}>
-          {t('home.headline')}
-        </ThemedText>
-        <ThemedText type="default" themeColor="textSecondary">
-          {t('home.subheadline')}
-        </ThemedText>
-      </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        {/* Header */}
+        <Box className="items-center gap-2">
+          <Badge variant="outline" className="rounded-full px-3 py-1">
+            <BadgeText className="text-xs font-semibold">RESETLY MOBILE</BadgeText>
+          </Badge>
+          <Text style={styles.title}>Welcome to Resetly</Text>
+          <Text style={styles.subtitle}>
+            Frontend boilerplate is ready. Test your UI, theme, and API setup locally.
+          </Text>
+        </Box>
 
-      {/* Primary CTA */}
-      <AppButton
-        label={t('home.ctaContinue')}
-        onPress={() => {/* navigate to habit logging */}}
-        variant="primary"
-        size="lg"
-      />
+        {/* Status Card */}
+        <Box className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 gap-4">
+          <Text style={styles.cardHeader}>System Status</Text>
 
-      {/* Weekly Progress Card */}
-      <Card>
-        <View style={styles.progressCardInner}>
-          <View style={styles.progressCardHeader}>
-            <ThemedText type="smallBold">{t('home.weeklyLabel')}</ThemedText>
-            <ThemedText type="smallBold" style={{ color: theme.accent }}>
-              {Math.round(WEEKLY_RATE * 100)}%
-            </ThemedText>
+          {/* Gluestack UI */}
+          <View style={styles.row}>
+            <Text style={styles.label}>UI Library</Text>
+            <Badge variant="default" className="rounded-full px-2.5">
+              <BadgeText className="text-xs">Gluestack UI v2</BadgeText>
+            </Badge>
           </View>
-          <ProgressBar progress={WEEKLY_RATE} />
-          <View style={styles.progressStats}>
-            <View style={styles.statItem}>
-              <ThemedText type="subtitle" style={[styles.statValue, { color: theme.primary }]}>
-                {MOCK_WEEKLY_STATS.completedThisWeek}
-              </ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                completed
-              </ThemedText>
-            </View>
-            <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
-            <View style={styles.statItem}>
-              <ThemedText type="subtitle" style={[styles.statValue, { color: theme.accent }]}>
-                {MOCK_WEEKLY_STATS.longestCurrentStreak}
-              </ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                {t('home.streakLabel')}
-              </ThemedText>
-            </View>
-            <View style={[styles.statDivider, { backgroundColor: theme.border }]} />
-            <View style={styles.statItem}>
-              <ThemedText type="subtitle" style={[styles.statValue, { color: theme.success }]}>
-                {MOCK_WEEKLY_STATS.habitsOnTrack}
-              </ThemedText>
-              <ThemedText type="small" themeColor="textSecondary">
-                on track
-              </ThemedText>
-            </View>
+
+          {/* Styling Engine */}
+          <View style={styles.row}>
+            <Text style={styles.label}>Styling</Text>
+            <Badge variant="secondary" className="rounded-full px-2.5">
+              <BadgeText className="text-xs">NativeWind v5 / Tailwind</BadgeText>
+            </Badge>
           </View>
-          {/* Mock data notice */}
-          <ThemedText type="small" themeColor="textSecondary" style={styles.mockNotice}>
-            {t('common.mockDataNotice')}
-          </ThemedText>
-        </View>
-      </Card>
 
-      {/* Habit List */}
-      <SectionHeader title={t('home.habitsSection')} subtitle="Your active routines" />
-      {MOCK_HABITS.map((habit) => (
-        <HabitCard key={habit.id} habit={habit} />
-      ))}
+          {/* API URL */}
+          <View style={styles.row}>
+            <Text style={styles.label}>API Base URL</Text>
+            <Text style={styles.value} numberOfLines={1}>
+              {apiUrl}
+            </Text>
+          </View>
 
-      {/* Daily Reflection */}
-      <View style={[styles.reflectionCard, { backgroundColor: theme.primary, borderRadius: Radius.lg }]}>
-        <ThemedText type="smallBold" style={{ color: theme.onPrimary, opacity: 0.7 }}>
-          {t('home.reflectionSection')}
-        </ThemedText>
-        <ThemedText type="default" style={{ color: theme.onPrimary, lineHeight: 26 }}>
-          "{t('home.reflectionPrompt')}"
-        </ThemedText>
+          {/* State / MMKV Storage Test */}
+          <View style={styles.row}>
+            <Text style={styles.label}>Haptics (MMKV Store)</Text>
+            <Pressable
+              onPress={() => setHapticsEnabled(!hapticsEnabled)}
+              style={[
+                styles.toggleButton,
+                { backgroundColor: hapticsEnabled ? '#1A2E4A' : '#94A3B8' },
+              ]}
+            >
+              <Text style={styles.toggleText}>
+                {hapticsEnabled ? 'Enabled' : 'Disabled'}
+              </Text>
+            </Pressable>
+          </View>
+        </Box>
+
+        {/* Getting Started note */}
+        <Box className="rounded-xl bg-neutral-100 dark:bg-neutral-800/60 p-4">
+          <Text style={styles.footerNote}>
+            Start developing your features by editing{' '}
+            <Text style={styles.code}>src/app/index.tsx</Text>.
+          </Text>
+        </Box>
       </View>
-    </ScreenContainer>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  greeting: {
-    gap: Spacing.two,
-  },
-  headline: {
-    fontSize: 32,
-    lineHeight: 40,
-    fontWeight: '700',
-  },
-  progressCardInner: {
-    gap: Spacing.three,
-  },
-  progressCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  progressStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingTop: Spacing.two,
-  },
-  statItem: {
-    alignItems: 'center',
-    gap: 2,
+  safeArea: {
     flex: 1,
   },
-  statValue: {
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingVertical: 24,
+    justifyContent: 'center',
+    gap: 24,
+    maxWidth: 540,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  title: {
     fontSize: 28,
     fontWeight: '700',
-    lineHeight: 34,
-  },
-  statDivider: {
-    width: 1,
-    height: 36,
-  },
-  mockNotice: {
-    fontSize: 11,
     textAlign: 'center',
-    fontStyle: 'italic',
-    opacity: 0.6,
   },
-  reflectionCard: {
-    padding: Spacing.four,
-    gap: Spacing.two,
+  subtitle: {
+    fontSize: 15,
+    textAlign: 'center',
+    opacity: 0.7,
+    lineHeight: 22,
+  },
+  cardHeader: {
+    fontSize: 17,
+    fontWeight: '700',
+    marginBottom: 4,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  label: {
+    fontSize: 14,
+    opacity: 0.8,
+  },
+  value: {
+    fontSize: 13,
+    fontWeight: '500',
+    maxWidth: 180,
+  },
+  toggleButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  toggleText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  footerNote: {
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 20,
+    opacity: 0.7,
+  },
+  code: {
+    fontFamily: 'monospace',
+    fontWeight: '700',
   },
 });
